@@ -15,6 +15,9 @@
 		781CB1D82033F4CF00AE76DC /* FridgeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781CB1D72033F4CF00AE76DC /* FridgeTableViewController.swift */; };
 		781CB1DA2033F4EB00AE76DC /* NavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781CB1D92033F4EB00AE76DC /* NavigationController.swift */; };
 		781CB1DD2033FC4900AE76DC /* ItemTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781CB1DC2033FC4900AE76DC /* ItemTableViewController.swift */; };
+		78374E7C203610A700AA5984 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78374E7B203610A700AA5984 /* Alert.swift */; };
+		78374E7E203610C300AA5984 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78374E7D203610C300AA5984 /* ProfileViewController.swift */; };
+		78374E80203647EC00AA5984 /* AlertPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78374E7F203647EC00AA5984 /* AlertPickerViewController.swift */; };
 		788BBD662033F0B200279A5A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 788BBD652033F0B200279A5A /* GoogleService-Info.plist */; };
 		78EBB78A2033ED210072D35E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78EBB7892033ED210072D35E /* AppDelegate.swift */; };
 		78EBB78C2033ED210072D35E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78EBB78B2033ED210072D35E /* LoginViewController.swift */; };
@@ -33,6 +36,9 @@
 		781CB1D72033F4CF00AE76DC /* FridgeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FridgeTableViewController.swift; sourceTree = "<group>"; };
 		781CB1D92033F4EB00AE76DC /* NavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationController.swift; sourceTree = "<group>"; };
 		781CB1DC2033FC4900AE76DC /* ItemTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTableViewController.swift; sourceTree = "<group>"; };
+		78374E7B203610A700AA5984 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		78374E7D203610C300AA5984 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		78374E7F203647EC00AA5984 /* AlertPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPickerViewController.swift; sourceTree = "<group>"; };
 		788BBD652033F0B200279A5A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		78EBB7862033ED210072D35E /* MyFridge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyFridge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		78EBB7892033ED210072D35E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -124,6 +130,8 @@
 				781CB1D92033F4EB00AE76DC /* NavigationController.swift */,
 				781CB1D72033F4CF00AE76DC /* FridgeTableViewController.swift */,
 				781CB1DC2033FC4900AE76DC /* ItemTableViewController.swift */,
+				78374E7D203610C300AA5984 /* ProfileViewController.swift */,
+				78374E7F203647EC00AA5984 /* AlertPickerViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -143,6 +151,7 @@
 				78EBB79E2033EE490072D35E /* Extensions.swift */,
 				781CB1CC2033F37D00AE76DC /* Fridge.swift */,
 				781CB1CE2033F39800AE76DC /* Item.swift */,
+				78374E7B203610A700AA5984 /* Alert.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -284,15 +293,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				781CB1DD2033FC4900AE76DC /* ItemTableViewController.swift in Sources */,
+				78374E7C203610A700AA5984 /* Alert.swift in Sources */,
 				781CB1D22033F3CF00AE76DC /* FridgeTableViewCell.swift in Sources */,
 				781CB1CF2033F39800AE76DC /* Item.swift in Sources */,
 				781CB1D82033F4CF00AE76DC /* FridgeTableViewController.swift in Sources */,
 				781CB1CD2033F37D00AE76DC /* Fridge.swift in Sources */,
+				78374E7E203610C300AA5984 /* ProfileViewController.swift in Sources */,
 				781CB1DA2033F4EB00AE76DC /* NavigationController.swift in Sources */,
 				78EBB78C2033ED210072D35E /* LoginViewController.swift in Sources */,
 				78EBB79F2033EE490072D35E /* Extensions.swift in Sources */,
 				781CB1D42033F3E000AE76DC /* ItemTableViewCell.swift in Sources */,
 				78EBB78A2033ED210072D35E /* AppDelegate.swift in Sources */,
+				78374E80203647EC00AA5984 /* AlertPickerViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

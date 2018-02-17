@@ -47,16 +47,14 @@ class FridgeTableViewController: UITableViewController {
         let fridge = fridges[indexPath.row]
         
         let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
-            let alert = UIAlertController(title: "Edit \"\(fridge.title!)\"", message: "\"\(fridge.desc!)\"", preferredStyle: .alert)
+            let alert = UIAlertController(title: "Edit \"\(fridge.title!)\"", message: "\"\(fridge.desc ?? "")\"", preferredStyle: .alert)
             alert.addTextField { (textField) -> Void in
                 textField.placeholder = "Title"
                 textField.text = fridge.title!
             }
             alert.addTextField { (textField) -> Void in
                 textField.placeholder = "Description"
-                if fridge.desc!.count > 0 {
-                    textField.text = fridge.desc!
-                }
+                textField.text = fridge.desc ?? ""
             }
             alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
             alert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.default, handler: {
@@ -166,6 +164,10 @@ class FridgeTableViewController: UITableViewController {
         }
     }
     
+    @objc func handleProfile() {
+        self.navigationController?.pushViewController(ProfileViewController(), animated: true)
+    }
+    
     fileprivate func setupView() {
         title = "My Fridges"
         
@@ -176,7 +178,8 @@ class FridgeTableViewController: UITableViewController {
         navigationItem.leftBarButtonItem = logout
         
         let add = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(handleAdd))
-        navigationItem.rightBarButtonItem = add
+        let profile = UIBarButtonItem(title: "Profile", style: .plain, target: self, action: #selector(handleProfile))
+        navigationItem.rightBarButtonItems = [ add, profile ]
         
         tableView.register(FridgeTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         loadFridges()

@@ -42,6 +42,77 @@ class ItemTableViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let item = items[indexPath.row]
+        
+        let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+            
+            let alert = UIAlertController(title: "Edit \"\(item.title!)\"", message: "\"\(item.desc ?? "")\"", preferredStyle: .alert)
+            alert.addTextField { (textField) -> Void in
+                textField.placeholder = "Title"
+                textField.text = item.title!
+            }
+            alert.addTextField { (textField) -> Void in
+                textField.placeholder = "Description"
+                textField.text = item.desc ?? ""
+            }
+            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
+            /* alert.addAction(UIAlertAction(title: "Set Alerts", style: UIAlertActionStyle.default, handler: {
+                (_) in
+                
+                let alertPicker = AlertPickerViewController()
+                
+                alertPicker.providesPresentationContextTransitionStyle = true;
+                alertPicker.definesPresentationContext = true;
+                alertPicker.modalPresentationStyle = .overCurrentContext;
+                
+                self.present(alertPicker, animated: true, completion: nil)
+            })) */
+            alert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.default, handler: {
+                (_) in
+                let title = alert.textFields?[0].text
+                let desc = alert.textFields?[1].text
+                
+                if title!.count > 0 {
+                    var uid = Auth.auth().currentUser?.uid
+                    
+                    if !(self.fridge?.isMine)! {
+                        uid = self.owner
+                    }
+                    self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).updateChildValues([ "name": title!, "description": desc! ])
+                } else {
+                    let extraAlert = UIAlertController(title: "Error", message: "A title is required!", preferredStyle: .alert)
+                    extraAlert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
+                    self.present(extraAlert, animated: true, completion: nil)
+                }
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        edit.backgroundColor = UIColor.rgb(red: 76, green: 217, blue: 100)
+        
+        let delete = UITableViewRowAction(style: .normal, title: "Delete") { action, index in
+            let alert = UIAlertController(title: "Delete \"\(item.title!)\"", message: "Do you want to delete this item?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
+            alert.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.default, handler: {
+                (_) in
+                    var uid = Auth.auth().currentUser?.uid
+                
+                    if !(self.fridge?.isMine)! {
+                        uid = self.owner
+                    }
+                self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).removeValue();
+            }))
+            self.present(alert, animated: true, completion: nil)
+        }
+        delete.backgroundColor = UIColor.rgb(red: 255, green: 59, blue: 48)
+        
+        return [ delete, edit ]
+    }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
     @objc func handleAdd() {
         let alert = UIAlertController(title: "Add Item", message: "Add item to \"\(fridge?.title ?? "")\"", preferredStyle: .alert)
         alert.addTextField { (textField) -> Void in
@@ -94,10 +165,6 @@ class ItemTableViewController: UITableViewController {
         
         ref.child(uid!).child("fridges").child((fridge?.key)!).child("items").observe(.value, with: { (snapshot) in
             self.items = [Item]()
-            
-            print(uid)
-            print(self.fridge?.key)
-            print(snapshot.children.allObjects.count)
             
             for child in snapshot.children.allObjects {
                 let childSnapshot = child as! DataSnapshot
