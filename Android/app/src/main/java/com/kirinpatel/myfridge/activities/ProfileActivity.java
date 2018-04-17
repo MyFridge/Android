@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -108,6 +109,18 @@ public class ProfileActivity extends AppCompatActivity {
                         getApplicationContext(),
                         "Your UID has been copied!",
                         Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Button link = findViewById(R.id.profile_link);
+        link.setVisibility(FirebaseAuth.getInstance().getCurrentUser().getEmail().isEmpty()
+                ? View.VISIBLE
+                : View.INVISIBLE);
+        link.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }

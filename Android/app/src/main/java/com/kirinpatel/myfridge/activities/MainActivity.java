@@ -9,10 +9,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.util.Log;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -29,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String TAG = "MAIN_ACTIVITY";
-
     private FirebaseAuth mAuth;
 
     @Override
@@ -41,8 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        Button emailSign = findViewById(R.id.signInWithEmail);
+        emailSign.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                displayEmailRequestDialog();
+            }
+        });
+
         Button phoneSignIn = findViewById(R.id.signInWithPhone);
         phoneSignIn.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 displayPhoneRequestDialog();
@@ -60,47 +69,73 @@ public class MainActivity extends AppCompatActivity {
     private void checkForUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            Log.d(TAG, "userIsSignedIn:true");
-
             Intent intent;
 
             if (user.getDisplayName() != null && user.getDisplayName().length() != 0) {
-                Log.d(TAG, "userHasDisplayName:true");
-                intent = new Intent(this, HomeActivity.class);
+                intent = new Intent(MainActivity.this, HomeActivity.class);
             } else {
-                Log.d(TAG, "userHasDisplayName:false");
-                intent = new Intent(this, OnBoarding.class);
+                intent = new Intent(MainActivity.this, OnBoarding.class);
             }
 
             startActivity(intent);
-        } else {
-            Log.d(TAG, "userIsSignedIn:false");
         }
     }
 
-    private void displayPhoneRequestDialog() {
+    private void displayEmailRequestDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Please Enter your Phone Number");
+        builder.setTitle("Sign in With Your Email Address");
+        builder.setMessage("If you do not already have an account one will be made for you.");
 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_PHONE);
-        builder.setView(input);
+        LinearLayout layout = new LinearLayout(builder.getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        final EditText email = new EditText(this);
+        email.setHint("Email Address");
+        email.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        layout.addView(email);
+
+        final EditText password = new EditText(this);
+        password.setHint("Password");
+        password.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        layout.addView(password);
+
+        builder.setView(layout);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                sendPhoneVerification(input.getText().toString());
+                verifyEmail(email.getText().toString(), password.getText().toString());
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
+        }).show();
+    }
 
-        builder.show();
+    private void displayPhoneRequestDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Sign in With Your Phone Number");
+
+        final EditText phone = new EditText(this);
+        phone.setInputType(InputType.TYPE_CLASS_PHONE);
+        builder.setView(phone);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                sendPhoneVerification(phone.getText().toString());
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        }).show();
     }
 
     private void displayPhoneVerificationDialog(final String verificationId) {
@@ -118,15 +153,48 @@ public class MainActivity extends AppCompatActivity {
                 signInWithPhone(PhoneAuthProvider.getCredential(verificationId,
                         input.getText().toString()));
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
+        }).show();
+    }
 
-        builder.show();
+    private void verifyEmail(final String email, final String password) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    checkForUser();
+                } else if (task.getException()
+                        .getLocalizedMessage()
+                        .equals("The email address is already in use by another account.")) {
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                checkForUser();
+                            } else {
+                                Snackbar.make(
+                                        findViewById(R.id.coordinator),
+                                        task.getException().getLocalizedMessage(),
+                                        Snackbar.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }
+                    });
+                } else {
+                    Snackbar.make(
+                            findViewById(R.id.coordinator),
+                            task.getException().getLocalizedMessage(),
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                }
+            }
+        });
     }
 
     private void sendPhoneVerification(String phoneNumber) {
@@ -139,12 +207,11 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onVerificationCompleted(PhoneAuthCredential credential) {
-                        Log.d(TAG, "onVerificationStateChanged:verified");
+
                     }
 
                     @Override
                     public void onVerificationFailed(FirebaseException e) {
-                        Log.w(TAG, "onVerificationStateChanged:failed", e);
                         Snackbar.make(
                                 findViewById(R.id.coordinator),
                                 e.getLocalizedMessage(),
@@ -155,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCodeSent(String verificationId,
                                            PhoneAuthProvider.ForceResendingToken token) {
-                        Log.d(TAG, "onVerificationStateChanged:codeSent");
                         displayPhoneVerificationDialog(verificationId);
                     }
                 });
@@ -167,10 +233,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:success");
                             checkForUser();
                         } else {
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                             if (task.getException() instanceof
                                     FirebaseAuthInvalidCredentialsException) {
                                 Snackbar.make(

@@ -22,10 +22,23 @@
                 android:layout_height="wrap_content">
 
                 <Button
+                    android:id="@+id/signInWithEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sign_in_email"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
                     android:id="@+id/signInWithPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sing_in_phone"
+                    android:text="@string/sign_in_phone"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
         </LinearLayout>

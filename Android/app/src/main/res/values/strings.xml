@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">MyFridge</string>
     <string name="app_profile">My Profile</string>
-    <string name="sing_in_phone">sign in with phone number</string>
+    <string name="sign_in_phone">sign in with phone number</string>
+    <string name="sign_in_email">sign in with email</string>
     <string name="on_boarding_header">Before you can start, we need your name.</string>
     <string name="on_boarding_name">Name</string>
     <string name="profile_name">Name</string>
     <string name="profile_disclaimer">Changes are saved automatically</string>
     <string name="profile_uid">UID</string>
     <string name="next">next</string>
+    <string name="profile_link">Link your accounts</string>
 </resources>

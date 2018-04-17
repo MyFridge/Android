@@ -166,15 +166,12 @@ public class FridgeActivity extends AppCompatActivity {
                             .show();
                 }
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void editFridge() {
@@ -188,22 +185,18 @@ public class FridgeActivity extends AppCompatActivity {
                 dialog.cancel();
                 editName();
             }
-        });
-        builder.setNegativeButton("EDIT DESCRIPTION", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("EDIT DESCRIPTION", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 dialog.cancel();
                 editDescription();
             }
-        });
-        builder.setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
+        }).setNeutralButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void editName() {
@@ -235,15 +228,12 @@ public class FridgeActivity extends AppCompatActivity {
                             .show();
                 }
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void editDescription() {
@@ -266,15 +256,12 @@ public class FridgeActivity extends AppCompatActivity {
                         .setValue(input.getText().toString());
                 loadFridge(fridge.getKey());
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void shareFridge() {
@@ -315,15 +302,12 @@ public class FridgeActivity extends AppCompatActivity {
                             .show();
                 }
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void deleteFridge() {
@@ -341,15 +325,12 @@ public class FridgeActivity extends AppCompatActivity {
                         .removeValue();
                 finish();
             }
-        });
-        builder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 
     private void loadFridge(final String key) {
@@ -393,10 +374,12 @@ public class FridgeActivity extends AppCompatActivity {
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     Item item = new Item(childSnapshot.getKey(),
                             childSnapshot.child("name").getValue().toString());
+
                     if (childSnapshot.child("description").exists()) {
                         item.setDescription(
                                 childSnapshot.child("description").getValue().toString());
                     }
+
                     items.add(item);
                 }
 

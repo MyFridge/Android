@@ -1,6 +1,5 @@
 package com.kirinpatel.myfridge.activities;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -128,7 +127,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private void displayWelcomeMessage() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Welcome " + user.getDisplayName());
@@ -156,11 +154,14 @@ public class HomeActivity extends AppCompatActivity {
 
         final ArrayList<Fridge> fridges = new ArrayList<>();
 
-        ref.child(user.getUid()).child("fridges").addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.child(user.getUid()).child("fridges")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getChildrenCount());
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    if (childSnapshot.child("name").exists()) {
+                    System.out.println(childSnapshot);
+                    if (childSnapshot.hasChildren()) {
                         Fridge fridge = new Fridge(
                                 childSnapshot.getKey(),
                                 childSnapshot.child("name").getValue().toString());
@@ -184,7 +185,6 @@ public class HomeActivity extends AppCompatActivity {
                                         key,
                                         childChildSnapshot.child("name").getValue().toString());
 
-                                System.out.println(fridge.getName());
                                 if (childChildSnapshot.child("description").exists()) {
                                     fridge.setDescription(
                                             childChildSnapshot
@@ -241,14 +241,11 @@ public class HomeActivity extends AppCompatActivity {
                     loadFridges();
                 }
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 }
