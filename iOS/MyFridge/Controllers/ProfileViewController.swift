@@ -31,6 +31,13 @@ class ProfileViewController: UIViewController, UIGestureRecognizerDelegate {
         return label
     }()
     
+    let linkAccount: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Link accounts", for: .normal)
+        button.addTarget(self, action: #selector(handleLinkAccounts), for: .touchUpInside)
+        return button
+    }()
+    
     var ref: DatabaseReference!
 
     override func viewDidLoad() {
@@ -70,6 +77,10 @@ class ProfileViewController: UIViewController, UIGestureRecognizerDelegate {
         view.addSubview(uid)
         uid.anchor(top: uidLabel.bottomAnchor, left: view.safeAreaLayoutGuide.leftAnchor, bottom: nil, right: view.safeAreaLayoutGuide.rightAnchor, paddingTop: 8, paddingLeft: 19.5, paddingBottom: 0, paddingRight: 8, width: 0, height: 0)
         
+        if (Auth.auth().currentUser?.email?.isEmpty)! {
+            view.addSubview(linkAccount)
+            linkAccount.anchor(top: uid.bottomAnchor, left: view.safeAreaLayoutGuide.leftAnchor, bottom: nil, right: view.safeAreaLayoutGuide.rightAnchor, paddingTop: 8, paddingLeft: 19.5, paddingBottom: 0, paddingRight: 8, width: 0, height: 0)
+        }
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleUIDTouched))
         tap.delegate = self
@@ -80,6 +91,10 @@ class ProfileViewController: UIViewController, UIGestureRecognizerDelegate {
         let shareContent:String = (Auth.auth().currentUser?.uid)!
         let activityViewController = UIActivityViewController(activityItems: [shareContent as NSString], applicationActivities: nil)
         self.present(activityViewController, animated: true, completion: {})
+    }
+    
+    @objc func handleLinkAccounts() {
+        
     }
     
     fileprivate func loadUser() {

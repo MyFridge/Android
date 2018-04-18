@@ -4,7 +4,6 @@ import FirebaseDatabase
 
 class ItemTableViewController: UITableViewController {
 
-    var owner: String?
     var fridge: Fridge?
     var items = [Item]()
     var ref: DatabaseReference!
@@ -74,12 +73,7 @@ class ItemTableViewController: UITableViewController {
                 let desc = alert.textFields?[1].text
                 
                 if title!.count > 0 {
-                    var uid = Auth.auth().currentUser?.uid
-                    
-                    if !(self.fridge?.isMine)! {
-                        uid = self.owner
-                    }
-                    self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).updateChildValues([ "name": title!, "description": desc! ])
+                    self.ref.child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).updateChildValues([ "name": title!, "description": desc! ])
                 } else {
                     let extraAlert = UIAlertController(title: "Error", message: "A title is required!", preferredStyle: .alert)
                     extraAlert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
@@ -95,12 +89,7 @@ class ItemTableViewController: UITableViewController {
             alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
             alert.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.default, handler: {
                 (_) in
-                    var uid = Auth.auth().currentUser?.uid
-                
-                    if !(self.fridge?.isMine)! {
-                        uid = self.owner
-                    }
-                self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).removeValue();
+                self.ref.child("fridges").child((self.fridge?.key)!).child("items").child((item.key)!).removeValue();
             }))
             self.present(alert, animated: true, completion: nil)
         }
@@ -128,14 +117,8 @@ class ItemTableViewController: UITableViewController {
             let desc = alert.textFields?[1].text
             
             if title!.count > 0 {
-                var uid = Auth.auth().currentUser?.uid
-                
-                if !(self.fridge?.isMine)! {
-                    uid = self.owner
-                }
-                
-                let key = self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").childByAutoId().key
-                self.ref.child(uid!).child("fridges").child((self.fridge?.key)!).child("items").child(key).setValue([ "name": title!, "description": desc! ])
+                let key = self.ref.child("fridges").child((self.fridge?.key)!).child("items").childByAutoId().key
+                self.ref.child("fridges").child((self.fridge?.key)!).child("items").child(key).setValue([ "name": title!, "description": desc! ])
             } else {
                 let extraAlert = UIAlertController(title: "Error", message: "A title is required!", preferredStyle: .alert)
                 extraAlert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
@@ -157,13 +140,7 @@ class ItemTableViewController: UITableViewController {
     }
     
     fileprivate func loadItems() {
-        var uid = Auth.auth().currentUser?.uid
-        
-        if !(fridge?.isMine)! {
-            uid = owner
-        }
-        
-        ref.child(uid!).child("fridges").child((fridge?.key)!).child("items").observe(.value, with: { (snapshot) in
+        ref.child("fridges").child((fridge?.key)!).child("items").observe(.value, with: { (snapshot) in
             self.items = [Item]()
             
             for child in snapshot.children.allObjects {
@@ -176,9 +153,9 @@ class ItemTableViewController: UITableViewController {
                 let item = Item(key: key, title: title, desc: desc)
                 
                 self.items.append(item!)
+                
+                self.tableView.reloadData()
             }
-            
-            self.tableView.reloadData()
         })
     }
 }

@@ -119,15 +119,7 @@ class FridgeTableViewController: UITableViewController {
         itemTable.fridge = fridge
         itemTable.title = fridge.title!
         
-        if !fridge.isMine! {
-            ref.child((Auth.auth().currentUser?.uid)!).child("fridges").child(fridge.key!).observeSingleEvent(of: .value, with: { (snapshot) in
-                itemTable.owner = snapshot.value as! String
-                
-                self.navigationController?.pushViewController(itemTable, animated: true)
-            })
-        } else {
-            self.navigationController?.pushViewController(itemTable, animated: true)
-        }
+        self.navigationController?.pushViewController(itemTable, animated: true)
     }
     
     @objc func handleAdd() {
@@ -186,38 +178,26 @@ class FridgeTableViewController: UITableViewController {
     }
 
     fileprivate func loadFridges() {
-        ref.child((Auth.auth().currentUser?.uid)!).child("fridges").observe(.value, with: { (snapshot) in
+        let uid = (Auth.auth().currentUser?.uid)!
+        ref.child(uid).child("fridges").observe(.value, with: { (snapshot) in
             self.fridges = [Fridge]()
             
             for child in snapshot.children.allObjects {
-                let childSnapshot = child as! DataSnapshot
-                
-                if childSnapshot.hasChildren() {
-                    let key = childSnapshot.key
-                    let title = childSnapshot.childSnapshot(forPath: "name").value as? String ?? ""
-                    let desc = childSnapshot.childSnapshot(forPath: "description").value as? String ?? ""
+                let fridgeKey: String = (child as! DataSnapshot).key
+                self.ref.child("fridges").child(fridgeKey).observeSingleEvent(of: .value, with: { (childSnapshot) in
+                    let canView: Bool = childSnapshot.childSnapshot(forPath: "users").hasChild(uid)
                     
-                    let fridge = Fridge(key: key, title: title, desc: desc, isMine: true)
-                    
-                    self.fridges.append(fridge!)
-                } else {
-                    let fridgeKey: String = childSnapshot.key
-                    let fridgeOwner: String = childSnapshot.value as! String
-                    
-                    self.ref.child(fridgeOwner).child("fridges").child(fridgeKey).observeSingleEvent(of: .value, with: { (snapshot) in
-                        let title = snapshot.childSnapshot(forPath: "name").value as? String ?? ""
-                        let desc = snapshot.childSnapshot(forPath: "description").value as? String ?? ""
+                    if canView {
+                        let title: String = childSnapshot.childSnapshot(forPath: "title").value as? String ?? ""
+                        let desc: String = childSnapshot.childSnapshot(forPath: "description").value as? String ?? ""
+                        let isMine: Bool = childSnapshot.childSnapshot(forPath: "users").childSnapshot(forPath: uid).childSnapshot(forPath: "permissions").value as? NSNumber ?? 0 == 2
                         
-                        let fridge = Fridge(key: fridgeKey, title: title, desc: desc, isMine: false)
-                        
-                        self.fridges.append(fridge!)
+                        self.fridges.append(Fridge(key: fridgeKey, title: title, desc: desc, isMine: isMine)!)
                         
                         self.tableView.reloadData()
-                    })
-                }
+                    }
+                })
             }
-            
-            self.tableView.reloadData()
         })
     }
 }

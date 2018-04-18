@@ -3,10 +3,17 @@ import FirebaseAuth
 
 class LoginViewController: UIViewController {
     
-    let login: UIButton = {
+    let phoneLogin: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Login", for: .normal)
-        button.addTarget(self, action: #selector(handleLogin), for: .touchUpInside)
+        button.setTitle("Login with Phone Number", for: .normal)
+        button.addTarget(self, action: #selector(handlePhoneLogin), for: .touchUpInside)
+        return button
+    }()
+    
+    let emailLogin: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Login with Enmail Address", for: .normal)
+        button.addTarget(self, action: #selector(handleEmailLogin), for: .touchUpInside)
         return button
     }()
     
@@ -43,8 +50,8 @@ class LoginViewController: UIViewController {
     }
     
     
-    @objc func handleLogin() {
-        let alert = UIAlertController(title: "Login", message: "Please enter your phone number.", preferredStyle: .alert)
+    @objc func handlePhoneLogin() {
+        let alert = UIAlertController(title: "Login with Phone Number", message: "Please enter your phone number.", preferredStyle: .alert)
         alert.addTextField { (textField) -> Void in
             textField.keyboardType = .phonePad
             textField.placeholder = "Phone Number"
@@ -59,9 +66,29 @@ class LoginViewController: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    @objc func handleEmailLogin() {
+        let alert = UIAlertController(title: "Login with Email Address", message: "Please enter your email address and password.", preferredStyle: .alert)
+        alert.addTextField { (textFiled) -> Void in
+            textFiled.keyboardType = .emailAddress
+            textFiled.placeholder = "Email Address"
+        }
+        alert.addTextField { (textFiled) -> Void in
+            textFiled.isSecureTextEntry = true
+            textFiled.placeholder = "Password"
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Login", style: UIAlertActionStyle.default, handler: {
+            (_) in
+            let email = alert.textFields?[0].text
+            let password = alert.textFields?[1].text
+            self.verifyEmailAddress(email: email!, password: password!)
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     fileprivate func setupView() {
-        view.addSubview(login)
-        login.centerInView(view: view)
+        view.addSubview(phoneLogin)
+        phoneLogin.centerInView(view: view)
         
         view.addSubview(info)
         info.anchor(top: nil, left: view.safeAreaLayoutGuide.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.safeAreaLayoutGuide.rightAnchor, paddingTop: 0, paddingLeft: 8, paddingBottom: -8, paddingRight: 8, width: 0, height: 0)
@@ -105,6 +132,12 @@ class LoginViewController: UIViewController {
             }
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    fileprivate func verifyEmailAddress(email: String, password: String) {
+        Auth.auth().createUser(withEmail: email, password: password) { (user, error) in
+            print(error.debugDescription)
+        }
     }
 }
 
