@@ -19,8 +19,9 @@
             </intent-filter>
         </activity>
 
+
         <activity
-            android:name=".activities.OnBoarding"
+            android:name=".activities.OnBoardingActivity"
             android:theme="@style/AppTheme.noActionBar"/>
 
         <activity

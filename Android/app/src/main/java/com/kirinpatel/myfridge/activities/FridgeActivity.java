@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kirinpatel.myfridge.R;
+import com.kirinpatel.myfridge.adapters.FridgeAdapter;
 import com.kirinpatel.myfridge.adapters.ItemAdapter;
 import com.kirinpatel.myfridge.utils.Fridge;
 import com.kirinpatel.myfridge.utils.Item;
@@ -108,18 +109,18 @@ public class FridgeActivity extends AppCompatActivity {
     }
 
     private void addItem() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(FridgeActivity.this);
         builder.setTitle("Add item");
 
-        LinearLayout layout = new LinearLayout(this);
+        LinearLayout layout = new LinearLayout(FridgeActivity.this);
         layout.setOrientation(LinearLayout.VERTICAL);
 
-        final EditText itemTitle = new EditText(this);
+        final EditText itemTitle = new EditText(FridgeActivity.this);
         itemTitle.setInputType(InputType.TYPE_CLASS_TEXT);
         itemTitle.setHint("Name");
         layout.addView(itemTitle);
 
-        final EditText itemDescription = new EditText(this);
+        final EditText itemDescription = new EditText(FridgeActivity.this);
         itemDescription.setInputType(InputType.TYPE_CLASS_TEXT);
         itemDescription.setMinLines(1);
         itemDescription.setMaxLines(3);
@@ -135,7 +136,7 @@ public class FridgeActivity extends AppCompatActivity {
                 String name = itemTitle.getText().toString();
                 String description = itemDescription.getText().toString();
 
-                if (name.length() > 0) {
+                if (!name.isEmpty()) {
                     String itemKey = ref.child("fridges")
                             .child(fridge.getKey())
                             .child("items")
@@ -154,12 +155,32 @@ public class FridgeActivity extends AppCompatActivity {
                             .child(itemKey)
                             .child("description")
                             .setValue(description);
+
+                    addItem();
                 } else {
                     Snackbar.make(
                             findViewById(R.id.coordinator),
                             "A name is required for an item!",
                             Snackbar.LENGTH_SHORT)
                             .show();
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(Snackbar.LENGTH_SHORT);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            } finally {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        addItem();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 }
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -273,15 +294,19 @@ public class FridgeActivity extends AppCompatActivity {
                 dialog.cancel();
                 final String uid = input.getText().toString();
 
-                if (uid.length() > 0
+                if (!uid.isEmpty()
                         && !uid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put(
-                            fridge.getKey(),
-                            FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    String pushKey = ref.child("users")
+                            .child(uid)
+                            .child("fridges")
+                            .push()
+                            .getKey();
 
-                    ref.child(uid)
-                            .child("fridges").updateChildren(map);
+                    ref.child("users")
+                            .child(uid)
+                            .child("fridges")
+                            .child(pushKey)
+                            .setValue(fridge.getKey());
 
                     Snackbar.make(
                             findViewById(R.id.coordinator),

@@ -18,30 +18,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.kirinpatel.myfridge.R;
+import com.kirinpatel.myfridge.holders.ItemViewHolder;
 import com.kirinpatel.myfridge.utils.Item;
 
 import java.util.ArrayList;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
+public class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference ref = database.getReference();
     private ArrayList<Item> items;
     private String fridgeKey;
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView itemTitle;
-        public TextView itemDescription;
-        public FloatingActionButton itemMore;
-
-        public ViewHolder(View view) {
-            super(view);
-            itemTitle = view.findViewById(R.id.card_title);
-            itemDescription = view.findViewById(R.id.card_description);
-            itemMore = view.findViewById(R.id.card_more);
-        }
-    }
 
     public ItemAdapter(ArrayList<Item> items, String fridgeKey) {
         this.items = items;
@@ -49,27 +36,23 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
     }
 
     @Override
-    public ItemAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_fridge, parent,false);
 
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ItemViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ItemViewHolder holder, int position) {
         final Item item = items.get(position);
 
-        holder.itemTitle.setText(item.getName());
-        if (item.getDescription().length() != 0) {
-            holder.itemDescription.setVisibility(View.VISIBLE);
-            holder.itemDescription.setText(item.getDescription());
-        }
-        holder.itemMore.setOnClickListener(new View.OnClickListener() {
+        holder.setTitle(item.getName());
+        holder.setDescription(item.getDescription());
+        holder.setMoreAction(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editItem(view.getContext(), item);
+                showItemActions(view.getContext(), item);
             }
         });
     }
@@ -79,7 +62,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         return items.size();
     }
 
-    private void editItem(final Context context, final Item item) {
+    private void showItemActions(final Context context, final Item item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Edit \"" + item.getName() + "\"?");
         builder.setMessage("You can change the name and description or delete of this item.");
@@ -88,7 +71,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                changeItem(context, item);
+                editItem(context, item);
             }
         });
         builder.setNegativeButton("DELETE", new DialogInterface.OnClickListener() {
@@ -113,9 +96,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         builder.show();
     }
 
-    private void changeItem(final Context context, final Item item) {
+    private void editItem(final Context context, final Item item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Add item");
+        builder.setTitle("Edit Item");
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -157,6 +140,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                             .child(item.getKey())
                             .child("description")
                             .setValue(description);
+
+                    item.setName(name);
+                    item.setDescription(description);
+                    ItemAdapter.this.notifyDataSetChanged();
                 } else {
                     Toast.makeText(
                             context,

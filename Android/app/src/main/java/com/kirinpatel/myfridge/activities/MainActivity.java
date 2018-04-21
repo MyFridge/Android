@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             if (user.getDisplayName() != null && user.getDisplayName().length() != 0) {
                 intent = new Intent(MainActivity.this, HomeActivity.class);
             } else {
-                intent = new Intent(MainActivity.this, OnBoarding.class);
+                intent = new Intent(MainActivity.this, OnBoardingActivity.class);
             }
 
             startActivity(intent);

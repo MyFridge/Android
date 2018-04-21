@@ -208,10 +208,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void createFridge() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
         builder.setTitle("Please enter the name of your fridge");
 
-        final EditText input = new EditText(this);
+        final EditText input = new EditText(HomeActivity.this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
@@ -228,14 +228,7 @@ public class HomeActivity extends AppCompatActivity {
                         .push()
                         .getKey();
                 String name = input.getText().toString();
-                if (name.length() == 0) {
-                    Snackbar.make(
-                            findViewById(R.id.coordinator),
-                            "A fridge must have a name!",
-                            Snackbar.LENGTH_SHORT)
-                            .show();
-                    createFridge();
-                } else {
+                if (!name.isEmpty()) {
                     ref.child("fridges")
                             .child(fridgeKey)
                             .child("name")
@@ -246,6 +239,29 @@ public class HomeActivity extends AppCompatActivity {
                             .child(pushKey)
                             .setValue(fridgeKey);
                     loadFridges();
+                } else {
+                    Snackbar.make(
+                            findViewById(R.id.coordinator),
+                            "A fridge must have a name!",
+                            Snackbar.LENGTH_SHORT)
+                            .show();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(Snackbar.LENGTH_SHORT);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            } finally {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        createFridge();
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
                 }
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
