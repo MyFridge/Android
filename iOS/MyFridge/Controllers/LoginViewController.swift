@@ -10,13 +10,6 @@ class LoginViewController: UIViewController {
         return button
     }()
     
-    let emailLogin: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Login with Enmail Address", for: .normal)
-        button.addTarget(self, action: #selector(handleEmailLogin), for: .touchUpInside)
-        return button
-    }()
-    
     let info: UILabel = {
         let label = UILabel()
         label.text = "If you do not already have an account, one will be created for you at login"
@@ -62,26 +55,6 @@ class LoginViewController: UIViewController {
             let phoneNumber = alert.textFields?[0].text
             UserDefaults.standard.set(phoneNumber!, forKey: "phoneNumber")
             self.sendVerificationCode(phoneNumber: phoneNumber!)
-        }))
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    @objc func handleEmailLogin() {
-        let alert = UIAlertController(title: "Login with Email Address", message: "Please enter your email address and password.", preferredStyle: .alert)
-        alert.addTextField { (textFiled) -> Void in
-            textFiled.keyboardType = .emailAddress
-            textFiled.placeholder = "Email Address"
-        }
-        alert.addTextField { (textFiled) -> Void in
-            textFiled.isSecureTextEntry = true
-            textFiled.placeholder = "Password"
-        }
-        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
-        alert.addAction(UIAlertAction(title: "Login", style: UIAlertActionStyle.default, handler: {
-            (_) in
-            let email = alert.textFields?[0].text
-            let password = alert.textFields?[1].text
-            self.verifyEmailAddress(email: email!, password: password!)
         }))
         self.present(alert, animated: true, completion: nil)
     }
@@ -132,12 +105,6 @@ class LoginViewController: UIViewController {
             }
         }))
         self.present(alert, animated: true, completion: nil)
-    }
-    
-    fileprivate func verifyEmailAddress(email: String, password: String) {
-        Auth.auth().createUser(withEmail: email, password: password) { (user, error) in
-            print(error.debugDescription)
-        }
     }
 }
 
