@@ -136,23 +136,19 @@ public class FridgeActivity extends AppCompatActivity {
                 String description = itemDescription.getText().toString();
 
                 if (name.length() > 0) {
-                    String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    String itemKey = ref.child(uid)
-                            .child("fridges")
+                    String itemKey = ref.child("fridges")
                             .child(fridge.getKey())
                             .child("items")
                             .push()
                             .getKey();
 
-                    ref.child(uid)
-                            .child("fridges")
+                    ref.child("fridges")
                             .child(fridge.getKey())
                             .child("items")
                             .child(itemKey)
                             .child("name")
                             .setValue(name);
-                    ref.child(uid)
-                            .child("fridges")
+                    ref.child("fridges")
                             .child(fridge.getKey())
                             .child("items")
                             .child(itemKey)
@@ -214,8 +210,7 @@ public class FridgeActivity extends AppCompatActivity {
                 dialog.cancel();
                 String name = input.getText().toString();
                 if (name.length() > 0) {
-                    ref.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                            .child("fridges")
+                    ref.child("fridges")
                             .child(fridge.getKey())
                             .child("name")
                             .setValue(name);
@@ -249,8 +244,7 @@ public class FridgeActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                ref.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .child("fridges")
+                ref.child("fridges")
                         .child(fridge.getKey())
                         .child("description")
                         .setValue(input.getText().toString());
@@ -319,8 +313,12 @@ public class FridgeActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                ref.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                ref.child("users")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                         .child("fridges")
+                        .child(fridge.getKey())
+                        .removeValue();
+                ref.child("fridges")
                         .child(fridge.getKey())
                         .removeValue();
                 finish();
@@ -334,8 +332,7 @@ public class FridgeActivity extends AppCompatActivity {
     }
 
     private void loadFridge(final String key) {
-        ref.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("fridges")
+        ref.child("fridges")
                 .child(key)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -345,7 +342,8 @@ public class FridgeActivity extends AppCompatActivity {
                     fridge.setDescription(snapshot.child("description").getValue().toString());
                 }
 
-                CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.fridge_collapsing);
+                CollapsingToolbarLayout collapsingToolbarLayout =
+                        findViewById(R.id.fridge_collapsing);
                 collapsingToolbarLayout.setTitle(fridge.getName());
 
                 loadItems();
@@ -362,8 +360,7 @@ public class FridgeActivity extends AppCompatActivity {
         final ProgressBar progressBar = findViewById(R.id.fridge_loadingIndicator);
         progressBar.setVisibility(View.VISIBLE);
 
-        ref.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("fridges")
+        ref.child("fridges")
                 .child(fridge.getKey())
                 .child("items")
                 .addValueEventListener(new ValueEventListener() {

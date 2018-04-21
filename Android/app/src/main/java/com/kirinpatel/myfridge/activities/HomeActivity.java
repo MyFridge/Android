@@ -35,8 +35,6 @@ import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private final String TAG = "HOME_ACTIVITY";
-
     private FirebaseUser user;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
     private DatabaseReference ref = database.getReference();
@@ -113,10 +111,8 @@ public class HomeActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
-            Log.d(TAG, "userIsSignedIn:true");
             loadFridges();
         } else {
-            Log.d(TAG, "userIsSignedIn:false");
             finish();
         }
     }
@@ -130,13 +126,9 @@ public class HomeActivity extends AppCompatActivity {
     private void displayWelcomeMessage() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Welcome " + user.getDisplayName());
-        builder.setMessage("MyFridge is currently under development, this means that only certain " +
+        builder.setMessage("MyFridge is currently under development, " +
+                "this means that only certain " +
                 "features are available and they may be buggy.");
-        /*
-        builder.setMessage("MyFridge is currently under development, this means that only certain " +
-                "features are available and they may be buggy. Before you begin, " +
-                "please follow the steps that will be shown to you next.");
-        */
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -154,57 +146,58 @@ public class HomeActivity extends AppCompatActivity {
 
         final ArrayList<Fridge> fridges = new ArrayList<>();
 
-        ref.child(user.getUid()).child("fridges")
+        ref.child("users")
+                .child(user.getUid())
+                .child("fridges")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                System.out.println(snapshot.getChildrenCount());
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    System.out.println(childSnapshot);
-                    if (childSnapshot.hasChildren()) {
-                        Fridge fridge = new Fridge(
-                                childSnapshot.getKey(),
-                                childSnapshot.child("name").getValue().toString());
-
-                        if (childSnapshot.child("description").exists()) {
-                            fridge.setDescription(
-                                    childSnapshot.child("description").getValue().toString());
-                        }
-                        fridges.add(fridge);
-                    } else {
-                        final String key = childSnapshot.getKey();
-                        final String uid = childSnapshot.getValue().toString();
-
-                        ref.child(uid)
-                                .child("fridges")
-                                .child(key)
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot childChildSnapshot) {
-                                Fridge fridge = new Fridge(
-                                        key,
-                                        childChildSnapshot.child("name").getValue().toString());
-
-                                if (childChildSnapshot.child("description").exists()) {
-                                    fridge.setDescription(
-                                            childChildSnapshot
-                                                    .child("description").getValue().toString());
-                                }
-                                fridges.add(fridge);
-
-                                recyclerView.setAdapter(new FridgeAdapter(fridges));
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
+                if (snapshot.getChildrenCount() == 0) {
+                    progressBar.setVisibility(View.GONE);
                 }
 
-                recyclerView.setAdapter(new FridgeAdapter(fridges));
-                progressBar.setVisibility(View.GONE);
+                for (final DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    ref.child("fridges")
+                            .child(childSnapshot.getValue().toString())
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot childChildSnapshot) {
+                                    if (childChildSnapshot.exists()) {
+                                        Fridge fridge = new Fridge(
+                                                childChildSnapshot.getKey(),
+                                                childChildSnapshot.child("name")
+                                                        .getValue()
+                                                        .toString());
+
+
+                                        if (childChildSnapshot.child("description").exists()) {
+                                            fridge.setDescription(
+                                                    childChildSnapshot
+                                                            .child("description")
+                                                            .getValue()
+                                                            .toString());
+                                        }
+
+                                        fridges.add(fridge);
+
+                                        recyclerView.setAdapter(new FridgeAdapter(fridges));
+                                    } else {
+                                        ref.child("users")
+                                                .child(user.getUid())
+                                                .child("fridges")
+                                                .child(childSnapshot.getKey())
+                                                .removeValue();
+                                    }
+
+                                    progressBar.setVisibility(View.GONE);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                }
             }
 
             @Override
@@ -226,7 +219,14 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
-                String fridgeKey = ref.child(user.getUid()).child("fridges").push().getKey();
+                String fridgeKey = ref.child("fridges")
+                        .push()
+                        .getKey();
+                String pushKey = ref.child("users")
+                        .child(user.getUid())
+                        .child("fridges")
+                        .push()
+                        .getKey();
                 String name = input.getText().toString();
                 if (name.length() == 0) {
                     Snackbar.make(
@@ -236,8 +236,15 @@ public class HomeActivity extends AppCompatActivity {
                             .show();
                     createFridge();
                 } else {
-                    ref.child(user.getUid()).child("fridges").child(fridgeKey).child("name")
+                    ref.child("fridges")
+                            .child(fridgeKey)
+                            .child("name")
                             .setValue(name);
+                    ref.child("users")
+                            .child(user.getUid())
+                            .child("fridges")
+                            .child(pushKey)
+                            .setValue(fridgeKey);
                     loadFridges();
                 }
             }

@@ -28,8 +28,6 @@ import com.kirinpatel.myfridge.R;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private final String TAG = "PROFILE_ACTIVITY";
-
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference ref = database.getReference();
 
@@ -51,6 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
         final EditText name = findViewById(R.id.profile_name);
         name.setText(user.getDisplayName());
         name.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -74,14 +73,11 @@ public class ProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Log.d(TAG, "updateProfile:success");
-
-                                        ref.child(user.getUid()).child("name").setValue(newName);
+                                        ref.child("users")
+                                                .child(user.getUid())
+                                                .child("name")
+                                                .setValue(newName);
                                     } else {
-                                        Log.w(
-                                                TAG,
-                                                "updateProfile:failure",
-                                                task.getException());
                                         Snackbar.make(
                                                 findViewById(R.id.coordinator),
                                                 "Error setting name: "
@@ -109,18 +105,6 @@ public class ProfileActivity extends AppCompatActivity {
                         getApplicationContext(),
                         "Your UID has been copied!",
                         Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Button link = findViewById(R.id.profile_link);
-        link.setVisibility(FirebaseAuth.getInstance().getCurrentUser().getEmail().isEmpty()
-                ? View.VISIBLE
-                : View.INVISIBLE);
-        link.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
             }
         });
     }

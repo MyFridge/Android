@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,8 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.kirinpatel.myfridge.R;
 
 public class OnBoarding extends AppCompatActivity {
-
-    private final String TAG = "ON_BOARDING_ACTIVITY";
 
     private FirebaseUser user;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -50,10 +47,7 @@ public class OnBoarding extends AppCompatActivity {
         super.onStart();
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            Log.d(TAG, "userIsSignedIn:true");
-        } else {
-            Log.d(TAG, "userIsSignedIn:false");
+        if (user == null) {
             finish();
         }
     }
@@ -72,16 +66,16 @@ public class OnBoarding extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d(TAG, "updateProfile:success");
-
-                                ref.child(user.getUid()).child("name").setValue(name);
+                                ref.child("users")
+                                        .child(user.getUid())
+                                        .child("name")
+                                        .setValue(name);
                                 Intent intent = new Intent(getApplicationContext(),
                                         HomeActivity.class);
                                 intent.putExtra("isNew", true);
                                 startActivity(intent);
                                 finish();
                             } else {
-                                Log.w(TAG, "updateProfile:failure", task.getException());
                                 Snackbar.make(
                                         findViewById(R.id.coordinator),
                                         "Error setting name: "

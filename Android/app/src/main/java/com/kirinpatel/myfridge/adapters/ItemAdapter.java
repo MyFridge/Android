@@ -95,10 +95,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
             @Override
             public void onClick(DialogInterface dialog, int i) {
                 dialog.cancel();
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                ref.child(uid)
-                        .child("fridges")
+                ref.child("fridges")
                         .child(fridgeKey)
                         .child("items")
                         .child(item.getKey())
@@ -146,18 +144,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                 String description = itemDescription.getText().toString();
 
                 if (name.length() > 0) {
-                    String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                    ref.child(uid)
-                            .child("fridges")
+                    ref.child("fridges")
                             .child(fridgeKey)
                             .child("items")
                             .child(item.getKey())
                             .child("name")
                             .setValue(name);
 
-                    ref.child(uid)
-                            .child("fridges")
+                    ref.child("fridges")
                             .child(fridgeKey)
                             .child("items")
                             .child(item.getKey())

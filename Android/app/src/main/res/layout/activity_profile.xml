@@ -53,12 +53,6 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/profile_uid"
                     android:editable="false"/>
-
-                <Button
-                    android:id="@+id/profile.link"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/profile_link"/>
             </LinearLayout>
 
             <TextView
