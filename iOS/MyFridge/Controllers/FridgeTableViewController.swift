@@ -63,7 +63,7 @@ class FridgeTableViewController: UITableViewController {
                 let desc = alert.textFields?[1].text
                 
                 if title!.count > 0 {
-                    self.ref.child((Auth.auth().currentUser?.uid)!).child("fridges").child(fridge.key!).updateChildValues([ "name": title!, "description": desc! ])
+                    self.ref.child("fridges").child(fridge.key!).updateChildValues([ "title": title!, "description": desc! ])
                 } else {
                     let extraAlert = UIAlertController(title: "Error", message: "A title is required!", preferredStyle: .alert)
                     extraAlert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
@@ -90,7 +90,8 @@ class FridgeTableViewController: UITableViewController {
             alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.default, handler: nil))
             alert.addAction(UIAlertAction(title: "Delete", style: UIAlertActionStyle.default, handler: {
             (_) in
-                self.ref.child((Auth.auth().currentUser?.uid)!).child("fridges").child(fridge.key!).removeValue();
+                self.ref.child("users").child((Auth.auth().currentUser?.uid)!).child("fridges").child(fridge.key!).removeValue()
+                self.ref.child("fridges").child(fridge.key!).removeValue()
             }))
             self.present(alert, animated: true, completion: nil)
         }
@@ -137,8 +138,11 @@ class FridgeTableViewController: UITableViewController {
             let desc = alert.textFields?[1].text
             
             if title!.count > 0 {
-                let key = self.ref.child((Auth.auth().currentUser?.uid)!).child("fridges").childByAutoId().key
-                self.ref.child((Auth.auth().currentUser?.uid)!).child("fridges").child(key).setValue([ "name": title!, "description": desc! ])
+                let key = self.ref.child("fridges").childByAutoId().key
+                let pushKey = self.ref.child("users").child((Auth.auth().currentUser?.uid)!).childByAutoId().key
+                self.ref.child("fridges").child(key).setValue([ "title": title!, "description": desc! ])
+                self.ref.child("fridges").child(key).child("users").child((Auth.auth().currentUser?.uid)!).child("permissions").setValue(2)
+                self.ref.child("users").child((Auth.auth().currentUser?.uid)!).child("fridges").child(key).setValue(pushKey)
             } else {
                 let extraAlert = UIAlertController(title: "Error", message: "A title is required!", preferredStyle: .alert)
                 extraAlert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler: nil))
@@ -179,20 +183,21 @@ class FridgeTableViewController: UITableViewController {
 
     fileprivate func loadFridges() {
         let uid = (Auth.auth().currentUser?.uid)!
-        ref.child(uid).child("fridges").observe(.value, with: { (snapshot) in
+        ref.child("users").child(uid).child("fridges").observeSingleEvent(of: .value, with: { (snapshot) in
             self.fridges = [Fridge]()
             
             for child in snapshot.children.allObjects {
-                let fridgeKey: String = (child as! DataSnapshot).key
+                let fridgeKey: String = (child as! DataSnapshot).value as! String
                 self.ref.child("fridges").child(fridgeKey).observeSingleEvent(of: .value, with: { (childSnapshot) in
                     let canView: Bool = childSnapshot.childSnapshot(forPath: "users").hasChild(uid)
                     
-                    if canView {
-                        let title: String = childSnapshot.childSnapshot(forPath: "title").value as? String ?? ""
+                    if (canView) {
+                        let title: String = childSnapshot.childSnapshot(forPath: "name").value as? String ?? ""
                         let desc: String = childSnapshot.childSnapshot(forPath: "description").value as? String ?? ""
-                        let isMine: Bool = childSnapshot.childSnapshot(forPath: "users").childSnapshot(forPath: uid).childSnapshot(forPath: "permissions").value as? NSNumber ?? 0 == 2
+                        let isMine: Bool = childSnapshot.childSnapshot(forPath: "users").childSnapshot(forPath: uid).childSnapshot(forPath: "permissions").value as? NSNumber ?? 1 == 2
                         
                         self.fridges.append(Fridge(key: fridgeKey, title: title, desc: desc, isMine: isMine)!)
+                        self.fridges.sort(by: { $0.title!.lowercased() < $1.title!.lowercased() })
                         
                         self.tableView.reloadData()
                     }

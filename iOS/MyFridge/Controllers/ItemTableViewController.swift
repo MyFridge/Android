@@ -153,6 +153,7 @@ class ItemTableViewController: UITableViewController {
                 let item = Item(key: key, title: title, desc: desc)
                 
                 self.items.append(item!)
+                self.items.sort(by: { $0.title! < $1.title! })
                 
                 self.tableView.reloadData()
             }
