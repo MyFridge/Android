@@ -1,8 +1,14 @@
+*.DS_Store
+.dart_tool/
 
-\.DS_Store
+.packages
+.pub/
 
-iOS/MyFridge/GoogleService-Info\.plist
+build/
 
-iOS/Pods/
+.flutter-plugins
 
-iOS/Podfile\.lock
+lib/firebase.dart
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+\.idea/
