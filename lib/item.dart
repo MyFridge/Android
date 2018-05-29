@@ -34,7 +34,7 @@ class ItemItem extends StatelessWidget {
                 item.name,
                 style: TextStyle(fontSize: 24.0),
               ),
-              new Padding(
+              Padding(
                 padding: const EdgeInsets.only(top: 2.0, bottom: 8.0),
                 child: Text(
                   item.description != null ? item.description : '',

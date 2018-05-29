@@ -5,19 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 String _name = '';
+String _uid = '';
 
 class Settings extends StatefulWidget {
-  Settings({this.auth, this.user, this.database});
-  final FirebaseAuth auth;
-  final FirebaseUser user;
-  final FirebaseDatabase database;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
 
   @override
   SettingsState createState() => SettingsState();
 }
 
 class SettingsState extends State<Settings> {
-
   @override
   Widget build(BuildContext context) {
     _getInfo();
@@ -44,7 +42,7 @@ class SettingsState extends State<Settings> {
             Container(
               padding: EdgeInsets.all(8.0),
               child: new Text(
-                'UID: ${widget.user.uid.substring(0, 6)}',
+                'UID: ${_uid.substring(0, _uid.length > 6 ? 6 : 0)}',
                 style: new TextStyle(
                   fontSize: 24.0,
                 ),
@@ -66,19 +64,24 @@ class SettingsState extends State<Settings> {
   }
 
   Future _getInfo() async {
-    return await widget.database
-        .reference()
-        .child('users')
-        .child(widget.user.uid)
-        .once()
-        .then((DataSnapshot snapshot) {
-      snapshot.value.forEach((k, v) {
-        if (k == 'name' && _name != v) {
-          setState(() {
-            _name = v;
+    return await widget.auth.currentUser().then((FirebaseUser user) {
+      if (user != null) {
+        widget.database
+            .reference()
+            .child('users')
+            .child(user.uid)
+            .once()
+            .then((DataSnapshot snapshot) {
+          snapshot.value.forEach((k, v) {
+            if (k == 'name' && _name != v) {
+              setState(() {
+                _name = v;
+                _uid = user.uid;
+              });
+            }
           });
-        }
-      });
+        });
+      }
     });
   }
 }

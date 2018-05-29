@@ -14,9 +14,10 @@ class Fridge {
 }
 
 class FridgeItem extends StatelessWidget {
-  FridgeItem({this.fridge, this.onPressed});
+  FridgeItem({this.fridge, this.onEdit, this.onView});
   final Fridge fridge;
-  final onPressed;
+  final onView;
+  final onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +46,28 @@ class FridgeItem extends StatelessWidget {
                   fridge.description != null ? fridge.description : '',
                 ),
               ),
-              RaisedButton(
-                onPressed: onPressed,
-                child: Text('View'),
-              )
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: RaisedButton(
+                      onPressed: onView,
+                      child: Text('View'),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: RaisedButton(
+                      onPressed: onEdit,
+                      child: Text('Edit'),
+                    ),
+                  ),
+                  RaisedButton(
+                    onPressed: null,
+                    child: Text('Delete'),
+                  )
+                ],
+              ),
             ],
           ),
         ),

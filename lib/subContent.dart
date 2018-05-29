@@ -7,11 +7,10 @@ import 'item.dart';
 import 'settings.dart';
 
 class SubContent extends StatefulWidget {
-  SubContent({this.fridge, this.auth, this.user, this.database});
+  SubContent({this.fridge});
   final Fridge fridge;
-  final FirebaseAuth auth;
-  final FirebaseUser user;
-  final FirebaseDatabase database;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
 
   @override
   State<StatefulWidget> createState() => _SubContentState();
@@ -69,11 +68,7 @@ class _SubContentState extends State<SubContent> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Settings(
-                        auth: widget.auth,
-                        user: widget.user,
-                        database: widget.database,
-                      ),
+                  builder: (context) => Settings(),
                 ),
               );
             },

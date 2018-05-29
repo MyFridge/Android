@@ -9,9 +9,8 @@ import 'settings.dart';
 import 'subContent.dart';
 
 class Content extends StatefulWidget {
-  Content({this.auth, this.database});
-  final FirebaseAuth auth;
-  final FirebaseDatabase database;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
 
   @override
   State<StatefulWidget> createState() => _ContentState();
@@ -39,22 +38,24 @@ class _ContentState extends State<Content> {
             .child(key)
             .once()
             .then((DataSnapshot snapshot) {
-          Fridge newFridge = new Fridge(key: key);
+          if (snapshot.value != null) {
+            Fridge newFridge = new Fridge(key: key);
 
-          snapshot.value.forEach((k, v) {
-            if (k == 'name') {
-              newFridge.name = v;
-            } else if (k == 'description') {
-              newFridge.description = v;
-            }
-          });
-
-          setState(() {
-            _fridges.add(newFridge);
-            _fridges.sort((Fridge a, Fridge b) {
-              return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+            snapshot.value.forEach((k, v) {
+              if (k == 'name') {
+                newFridge.name = v;
+              } else if (k == 'description') {
+                newFridge.description = v;
+              }
             });
-          });
+
+            setState(() {
+              _fridges.add(newFridge);
+              _fridges.sort((Fridge a, Fridge b) {
+                return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+              });
+            });
+          }
         });
       });
     });
@@ -86,11 +87,7 @@ class _ContentState extends State<Content> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Settings(
-                        auth: widget.auth,
-                        user: _user,
-                        database: widget.database,
-                      ),
+                  builder: (context) => Settings(),
                 ),
               );
             },
@@ -104,17 +101,46 @@ class _ContentState extends State<Content> {
       body: new ListView.builder(
         itemBuilder: (BuildContext context, int index) => new FridgeItem(
               fridge: _fridges[index],
-              onPressed: () {
+              onView: () {
                 Navigator.push(
                   context,
                   new MaterialPageRoute(
-                      builder: (context) => new SubContent(
-                            fridge: _fridges[index],
-                            auth: widget.auth,
-                            user: _user,
-                            database: widget.database,
-                          )),
+                    builder: (context) => new SubContent(
+                          fridge: _fridges[index],
+                        ),
+                  ),
                 );
+              },
+              onEdit: () {
+                Scaffold.of(context).showBottomSheet((context) {
+                  return Container(
+                    padding: EdgeInsets.all(8.0),
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const Text(
+                          'Edit Fridge',
+                          style: TextStyle(fontSize: 24.0),
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: _fridges[index].name,
+                              hintText: 'New Name'),
+                        ),
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: _fridges[index].description,
+                              hintText: 'New Description'),
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).size.height / 10,
+                        ),
+                      ],
+                    ),
+                  );
+                });
               },
             ),
         itemCount: _fridges.length,

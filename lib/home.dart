@@ -10,9 +10,8 @@ final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 bool _hasLoaded = false;
 
 class Home extends StatelessWidget {
-  Home({this.auth, this.database});
-  final FirebaseAuth auth;
-  final FirebaseDatabase database;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseDatabase database = FirebaseDatabase.instance;
 
   String _email;
   String _password;
@@ -21,8 +20,11 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!_hasLoaded) {
       _hasLoaded = true;
+      database.setPersistenceEnabled(true);
       _checkForUser().then((user) {
-        _loadContent(context);
+        if (user != null) {
+          _loadContent(context);
+        }
       });
     }
 
@@ -108,10 +110,8 @@ class Home extends StatelessWidget {
     Navigator.push(
       context,
       new MaterialPageRoute(
-          builder: (context) => new Content(
-                auth: auth,
-                database: database,
-              )),
+        builder: (context) => new Content(),
+      ),
     );
   }
 }
