@@ -4,9 +4,9 @@ description: An easy, real-time way to share the contents of your fridge(s).
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^0.2.3
-  firebase_auth: ^0.5.10
-  firebase_database: ^0.4.6
+  firebase_core: ^0.2.5
+  firebase_auth: ^0.6.2
+  firebase_database: ^1.0.5
   share: ^0.5.2
 
   # The following adds the Cupertino Icons font to your application.
