@@ -5,6 +5,9 @@ import 'home.dart';
 void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MyFridge(),
+      theme: ThemeData(
+        brightness: Brightness.dark,
+      ),
     ));
 
 class MyFridge extends StatefulWidget {
