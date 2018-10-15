@@ -28,57 +28,73 @@ class Home extends StatelessWidget {
       });
     }
 
+    var emailFormField = TextFormField(
+      decoration: const InputDecoration(labelText: 'Email Address'),
+      validator: (value) {
+        if (value.isEmpty ||
+                      !value.contains('@') ||
+                      !value.contains('.')) {
+                    _email = '';
+                    return 'A valid email address is required.';
+                  } else {
+          _email = value;
+        }
+      },
+    );
+
+    var passwordFormField = TextFormField(
+      decoration: const InputDecoration(labelText: 'Password'),
+      obscureText: true,
+      validator: (value) {
+                  if (value.isEmpty) {
+                    _password = '';
+                    return 'A password is required.';
+                  } else {
+          _password = value;
+        }
+      },
+    );
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 8.0,
           horizontal: 20.0,
         ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Email Address'),
-                validator: (value) {
-                  if (value.isEmpty ||
-                      !value.contains('@') ||
-                      !value.contains('.')) {
-                    _email = '';
-                    return 'A valid email address is required.';
-                  } else {
-                    _email = value;
-                  }
-                },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  emailFormField,
+                  passwordFormField,
+                ],
               ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    _password = '';
-                    return 'A password is required.';
-                  } else {
-                    _password = value;
-                  }
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: RaisedButton(
-                    onPressed: () {
-                      if (_formKey.currentState.validate()) {
-                        Scaffold.of(context).showSnackBar(const SnackBar(
-                            content: const Text('Logging in...')));
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: RaisedButton(
+                      onPressed: () {
+                        if (_formKey.currentState.validate()) {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: const Text('Logging in...')));
 
-                        _handleAuth(_email, _password)
-                            .then((FirebaseUser user) {
-                          _loadContent(context);
-                        }).catchError((error) {
-                          Scaffold.of(context).showSnackBar(const SnackBar(
+                          _handleAuth(_email, _password)
+                              .then((FirebaseUser user) {
+                            Scaffold.of(context).hideCurrentSnackBar();
+                            _loadContent(context);
+                          }).catchError((error) {
+                            Scaffold.of(context).showSnackBar(const SnackBar(
                               content: const Text(
                                   'The email address or password are incorrect.')));
                         });
@@ -97,11 +113,12 @@ class Home extends StatelessWidget {
                         Scaffold.of(context).showSnackBar(const SnackBar(
                             content: const Text('Creating account...')));
 
-                        _handleRegister(_email, _password)
-                            .then((FirebaseUser user) {
-                          _loadContent(context);
-                        }).catchError((error) {
-                          Scaffold.of(context).showSnackBar(SnackBar(
+                          _handleRegister(_email, _password)
+                              .then((FirebaseUser user) {
+                            Scaffold.of(context).hideCurrentSnackBar();
+                            _loadContent(context);
+                          }).catchError((error) {
+                            Scaffold.of(context).showSnackBar(SnackBar(
                               duration: Duration(seconds: 10),
                               content: Text(error.toString())));
                         });
@@ -110,10 +127,22 @@ class Home extends StatelessWidget {
                     child: const Text('register'),
                   ),
                 ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: RaisedButton(
+                  onPressed: () {
+
+                  },
+                  child: const Text('login with phone number'),
+                ),
               ),
-            ],
-          ),
-        ),
+            ),
+          ],
+        )
       ),
     );
   }
