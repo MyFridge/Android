@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class Fridge {
-  Fridge({this.key, this.name, this.description});
+  Fridge({this.key, this.name, this.description, this.permissions});
   String key;
   String name;
   String description;
+  int permissions = 0;
 
   @override
   String toString() {
@@ -14,10 +15,13 @@ class Fridge {
 }
 
 class FridgeItem extends StatelessWidget {
-  FridgeItem({this.fridge, this.onEdit, this.onView});
+  FridgeItem(
+      {this.fridge, this.onView, this.onEdit, this.onDelete, this.onLeave});
   final Fridge fridge;
   final onView;
   final onEdit;
+  final onDelete;
+  final onLeave;
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +62,13 @@ class FridgeItem extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: RaisedButton(
-                      onPressed: onEdit,
+                      onPressed: fridge.permissions == 2 ? onEdit : null,
                       child: Text('Edit'),
                     ),
                   ),
                   RaisedButton(
-                    onPressed: null,
-                    child: Text('Delete'),
+                    onPressed: fridge.permissions == 2 ? onDelete : onLeave,
+                    child: Text(fridge.permissions == 2 ? 'Delete' : 'Leave'),
                   )
                 ],
               ),

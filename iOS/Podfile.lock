@@ -46,12 +46,15 @@ PODS:
     - nanopb/encode (= 0.3.8)
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
+  - share (0.5.2):
+    - Flutter
 
 DEPENDENCIES:
   - firebase_auth (from `Pods/.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `Pods/.symlinks/plugins/firebase_core/ios`)
   - firebase_database (from `Pods/.symlinks/plugins/firebase_database/ios`)
-  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
+  - share (from `Pods/.symlinks/plugins/share/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -74,7 +77,9 @@ EXTERNAL SOURCES:
   firebase_database:
     :path: Pods/.symlinks/plugins/firebase_database/ios
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-release
+    :path: Pods/.symlinks/flutter/ios
+  share:
+    :path: Pods/.symlinks/plugins/share/ios
 
 SPEC CHECKSUMS:
   Firebase: 4bd804448ab2596794698773d41520a0af101e65
@@ -91,7 +96,8 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  share: 222b5dcc8031238af9d7de91149df65bad1aef75
 
 PODFILE CHECKSUM: 13dcf421f4da2e937a57e8ba760ed880beae536f
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3

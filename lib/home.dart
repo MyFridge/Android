@@ -88,6 +88,29 @@ class Home extends StatelessWidget {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: RaisedButton(
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        Scaffold.of(context).showSnackBar(const SnackBar(
+                            content: const Text('Creating account...')));
+
+                        _handleRegister(_email, _password)
+                            .then((FirebaseUser user) {
+                          _loadContent(context);
+                        }).catchError((error) {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              duration: Duration(seconds: 10),
+                              content: Text(error.toString())));
+                        });
+                      }
+                    },
+                    child: const Text('register'),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -103,6 +126,13 @@ class Home extends StatelessWidget {
     return await auth.signInWithEmailAndPassword(
       email: email,
       password: password,
+    );
+  }
+
+  Future<FirebaseUser> _handleRegister(String email, String password) async {
+    return await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password
     );
   }
 
